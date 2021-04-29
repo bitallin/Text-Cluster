@@ -1,3 +1,4 @@
 data/pretrain_word_embed/*
-data/res.txt
+data/raw
 logs/task.log
+nogit
