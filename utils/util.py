@@ -15,5 +15,4 @@ def split_list(li, n):
     return [li[i:i + per_num] for i in range(0, len(li), per_num)]
 
 
-a = [1, 2, 3, 4, 6]
-print(split_list(a, 3))
+

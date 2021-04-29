@@ -45,7 +45,6 @@ class TextVecModel:
         _text = self.lac.run([text])[0]
         # [(word, pos, weight), ()]
         _text = [(_text[0][i], _text[1][i], self.key_pos_w[v],) for i, v in enumerate(_text[-1]) if v in self.key_pos_w]
-        # TODO deduplicate
         words_deduplicated = self.text_help.wordsDeduplication([i[0] for i in _text])
         final_text = []
         for i in _text:
@@ -75,13 +74,13 @@ class TextVecModel:
         return texts
 
     def update_key_pos_w(self, k: str, v: float):
+        "update the pos weight for computing sentence vector"
         self.key_pos_w[k] = v
         return 1
 
-
 #
-word_fp = "data/pretrain_word_embed/100000-small.txt"
-t = TextVecModel(word_fp)
-texts = ['2016年初，“世界那么大，想要去看看”在网上爆红，大家都纷纷开始向往诗和远方一个人旅行如何才能拍出美美的游客照？#三星S21#带你重返2016年，告诉你答案～']
-rtn = t.make_records(texts)
-logger.debug(list(map(lambda x: x.keyword, rtn)))
+# word_fp = "data/pretrain_word_embed/100000-small.txt"
+# t = TextVecModel(word_fp)
+# texts = ['2016年初，“世界那么大，想要去看看”在网上爆红，大家都纷纷开始向往诗和远方一个人旅行如何才能拍出美美的游客照？#三星S21#带你重返2016年，告诉你答案～']
+# rtn = t.make_records(texts)
+# logger.debug(list(map(lambda x: x.keyword, rtn)))

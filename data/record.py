@@ -11,6 +11,11 @@ import numpy as np
 
 
 class Record:
+    """
+        text:       '北京在中国的北方'
+        vecL:       np.array
+        Keyword:    [('北京', n), ('中国', n),.. ]
+    """
     def __init__(self, text, vec: np.ndarray = None, keyword: list = None):
         self.text = text
         self.vec = vec

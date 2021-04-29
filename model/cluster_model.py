@@ -22,12 +22,16 @@ logger = init_file_logger()
 
 
 class TextClusterModel:
-    def __init__(self, texts: List[str], vec_fp: str = 'data/pretrain_word.embed', top_k: int = 1000,
-                 sim_threshold: float = 0.7, ):
+    """
+        text cluster
+    """
 
-        self.w2v_model = TextVecModel(word_vec_fp=vec_fp)
+    def __init__(self, texts: List[str], vec_model: TextVecModel, top_k: int = 1000,
+                 sim_threshold: float = 0.9, ):
+
+        # self.vec_model = vec_model   # Current paddle do not support multiprocess for pickle
         logger.info('W2V Model has been initialized successfully!')
-        record_list = self.w2v_model.make_records(texts)
+        record_list = vec_model.make_records(texts)
         logger.info('Texts to Records, finished.')
         self.sim_threshold = sim_threshold
         self.top_k = top_k
@@ -41,7 +45,7 @@ class TextClusterModel:
             max_sim_idx = int(np.argmax(sim))
             max_sim_value = sim[max_sim_idx]
             if max_sim_value >= self.sim_threshold:
-                hotspot_list[max_sim_idx].update(record)
+                hotspot_list[max_sim_idx].append_record(record)
             else:
                 hotspot_list.append(Hotspot(record))
                 hotspot_vecs = np.vstack((hotspot_vecs, record.vec))
@@ -51,6 +55,47 @@ class TextClusterModel:
     @staticmethod
     def parse_hotspots(hotspots: List[Hotspot]) -> list:
         return [{'texts': hotspot.get_texts(), 'rank': hotspot.ranks} for hotspot in hotspots]
+
+    def cluster_to(self, global_var_list: List[Hotspot]):
+        res = self.run()
+        global_var_list.append(res)
+
+
+class HotspotClusterModel:
+    """
+        2 hotspot group cluster
+    """
+
+    def __init__(self, hotspots_1: List[Hotspot], hotspots_2: List[Hotspot], top_k: int = 1000,
+                 sim_threshold: float = 0.85, ):
+
+        self.hotspot_1 = hotspots_1
+        self.hotspot_2 = hotspots_2
+        self.sim_threshold = sim_threshold
+        self.top_k = top_k
+
+    def run(self) -> List[Hotspot]:
+
+        hotspots_vecs = np.array([hotspot.vec for hotspot in self.hotspot_1])
+        for hotspot in self.hotspot_2:
+            sim = cosine_similarity(hotspot.vec.reshape(1, -1), hotspots_vecs)[0]
+            max_sim_idx = int(np.argmax(sim))
+            max_sim_value = sim[max_sim_idx]
+            if max_sim_value >= self.sim_threshold:
+                self.hotspot_1[max_sim_idx].append_hotspot(hotspot)
+            else:
+                self.hotspot_1.append(hotspot)
+                hotspots_vecs = np.vstack((hotspots_vecs, hotspot.vec))
+        hotspot_list = sorted(self.hotspot_1, key=lambda x: x.ranks, reverse=True)[:self.top_k]
+        return hotspot_list
+
+    @staticmethod
+    def parse_hotspots(hotspots: List[Hotspot]) -> list:
+        return [{'texts': hotspot.get_texts(), 'rank': hotspot.ranks} for hotspot in hotspots]
+
+    def cluster_to(self, global_var_list: List[Hotspot]):
+        res = self.run()
+        global_var_list.append(res)
 
 
 def check():
@@ -66,9 +111,7 @@ def check():
     with open(fp, 'w', encoding='utf8') as f:
         for i in res:
             for j in i['texts']:
-                f.write(j+'\n')
+                f.write(j + '\n')
             f.write('=================================\n')
 
-
-
-check()
+# check()

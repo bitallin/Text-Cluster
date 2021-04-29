@@ -3,5 +3,5 @@ data/raw
 logs/task.log
 nogit
 *.xml
-__pychache__
+__pycache__
 .idea

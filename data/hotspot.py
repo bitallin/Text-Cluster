@@ -10,7 +10,13 @@
 from data.record import Record
 
 
+
 class Hotspot:
+    """
+        title:       '北京在中国的北方'
+        vec:         np.array
+        Keyword:    [('北京', n), ('中国', n),.. ]
+    """
     def __init__(self, record: Record):
         """
             initialize through one record
@@ -23,7 +29,7 @@ class Hotspot:
         self.ranks = len(self.record_list)
         self.keyword = record.keyword
 
-    def update(self, record: Record):
+    def append_record(self, record: Record):
         """
             add a record
         Args:
@@ -32,6 +38,10 @@ class Hotspot:
         """
         self.record_list.append(record)
         self.ranks = len(self.record_list)
+
+    def append_hotspot(self, hotspot):
+        self.record_list.extend(hotspot.record_list)
+        self.ranks += hotspot.ranks
 
     def get_texts(self):
         return [record.text for record in self.record_list]
