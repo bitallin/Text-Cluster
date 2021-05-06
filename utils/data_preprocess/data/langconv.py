@@ -3,13 +3,13 @@
 
 from copy import deepcopy
 from utils.data_preprocess.data.zh_wiki import zh2Hant, zh2Hans
+
 try:
     import psyco
 
     psyco.full()
 except:
     pass
-
 
 import sys
 

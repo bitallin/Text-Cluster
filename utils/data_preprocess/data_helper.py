@@ -33,12 +33,14 @@ class TextClear:
         self.re_digit = re.compile(r'\d+')
         self.re_http = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
         self.re_forward = re.compile("@.*?: ", re.S)
-        self.re_emoji = re.compile(r"\[.*?]", re.S)
+
         self.re_at = re.compile("@.*?( |:)", re.S)
         self.re_yuanweibo = re.compile(r"【原微博】", re.S)
         self.re_http_tag = re.compile(r"<.*>")
 
+        self.re_emoji = re.compile(r"\[.*]", re.S)
         self.re_hard = re.compile(r"​​", re.S)
+        self.re_hard2 = re.compile(r"【.*】")
 
     def clear_for_words(self, sentence):
         '''
@@ -70,12 +72,16 @@ class TextClear:
             seq_len:
         Returns:
         """
+
         sentence = self.tradition_to_simple(sentence)
         sentence = re.sub(self.re_hard, "", sentence)
+        sentence = re.sub(self.re_hard2, "", sentence)
         sentence = self.delete_http_tag(sentence)
+        # delete at
+        sentence = self.delete_at(sentence)
         sentence = self.delete_none(sentence)
         sentence = self.delete_emoji(sentence)
-        sentence = self.delete_at(sentence)
+
         sentence = self.delete_http(sentence)
 
         return sentence[:seq_len]
@@ -150,5 +156,7 @@ class TextClear:
 
         return rtn_word_list
 
-
+#
 # t = TextClear()
+# res = t.base_bert_clear(sentence='@天天都开心 , [阿斯顿撒]的。。【啊实打实打算】')
+# print(res)

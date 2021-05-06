@@ -40,7 +40,7 @@ class TextVecModel:
         """
 
         # _text = self.text_help.base_bert_clear(str(text)[:256])
-        text = self.text_help.base_bert_clear(str(text))[:256]  # return text after clearing
+        text = self.text_help.base_bert_clear(str(text))[:128]  # return text after clearing
         text_vec = np.zeros(self.word_vec_dim)
         _text = self.lac.run([text])[0]
         # [(word, pos, weight), ()]

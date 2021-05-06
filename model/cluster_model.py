@@ -16,7 +16,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from data.hotspot import Hotspot
 from model.text2vector import TextVecModel
 from logs import init_file_logger
-import pandas as pd
 
 logger = init_file_logger()
 
@@ -25,9 +24,8 @@ class TextClusterModel:
     """
         text cluster
     """
-
     def __init__(self, texts: List[str], vec_model: TextVecModel, top_k: int = 1000,
-                 sim_threshold: float = 0.9, ):
+                 sim_threshold: float = 0.93, ):
 
         # self.vec_model = vec_model   # Current paddle do not support multiprocess for pickle
         logger.info('W2V Model has been initialized successfully!')
@@ -67,7 +65,7 @@ class HotspotClusterModel:
     """
 
     def __init__(self, hotspots_1: List[Hotspot], hotspots_2: List[Hotspot], top_k: int = 1000,
-                 sim_threshold: float = 0.85, ):
+                 sim_threshold: float = 0.88, ):
 
         self.hotspot_1 = hotspots_1
         self.hotspot_2 = hotspots_2
@@ -96,22 +94,3 @@ class HotspotClusterModel:
     def cluster_to(self, global_var_list: List[Hotspot]):
         res = self.run()
         global_var_list.append(res)
-
-
-def check():
-    wv_fp = 'data/pretrain_word_embed/100000-small.txt'
-    data_fp = 'data/ss_report.xlsx'
-    df = pd.read_excel(data_fp)
-    texts = df['采集内容']
-    cluster_model = TextClusterModel(texts, wv_fp, 10, 0.85)
-    hotspots = cluster_model.run()
-    res = cluster_model.parse_hotspots(hotspots)
-
-    fp = 'data/res.log'
-    with open(fp, 'w', encoding='utf8') as f:
-        for i in res:
-            for j in i['texts']:
-                f.write(j + '\n')
-            f.write('=================================\n')
-
-# check()
