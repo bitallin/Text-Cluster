@@ -3,19 +3,19 @@
 # @Time     : 2021/4/29 10:33
 # @Author   : Letter
 # @Desc     : Cluster entrypoint
-# @File     : run_cluster.py
+# @File     : cluster.py
 # @Contact  : 5403517@qq.com 
 # @Reference:
 
 from multiprocessing import Manager
 from multiprocessing import Process
 from typing import List
+
 from data.hotspot import Hotspot
 from logs import init_file_logger
 from model.cluster_model import TextClusterModel, HotspotClusterModel
 from model.text2vector import TextVecModel
 from utils.util import split_list
-import pandas as pd
 
 logger = init_file_logger('logs/task.log')
 

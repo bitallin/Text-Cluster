@@ -14,8 +14,8 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data.hotspot import Hotspot
-from model.text2vector import TextVecModel
 from logs import init_file_logger
+from model.text2vector import TextVecModel
 
 logger = init_file_logger()
 
@@ -24,6 +24,7 @@ class TextClusterModel:
     """
         text cluster
     """
+
     def __init__(self, texts: List[str], vec_model: TextVecModel, top_k: int = 1000,
                  sim_threshold: float = 0.93, ):
 
