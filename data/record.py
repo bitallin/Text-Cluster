@@ -16,10 +16,12 @@ class Record:
         vecL:       np.array
         Keyword:    [('北京', n), ('中国', n),.. ]
     """
-    def __init__(self, text, vec: np.ndarray = None, keyword: list = None):
+
+    def __init__(self, text, vec: np.ndarray = None, keyword: list = None, id_num=None):
         self.text = text
         self.vec = vec
         self.keyword = keyword
+        self.id_num = id_num
 
     def __str__(self):
         return self.text
