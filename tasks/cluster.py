@@ -26,9 +26,11 @@ class TextCluster:
         self.process_num = process_num
         self.pretrain_wv_fp = pretrain_wv_fp
 
-    def cluster_to_hotspot(self, texts, top_k=20) -> List[Hotspot]:
+    def cluster_to_hotspot(self, texts, ids, top_k=20) -> List[Hotspot]:
+        assert len(texts) == len(ids), 'keep length equal'
         texts = split_list(texts, self.process_num)
-        model_list = [TextClusterModel(texts[i], self.w2v_model) for i in range(self.process_num)]
+        ids = split_list(ids, self.process_num)
+        model_list = [TextClusterModel(texts[i], ids[i], self.w2v_model) for i in range(self.process_num)]
         shared_res_list = Manager().list([])
         p_list = [Process(target=m.cluster_to, args=(shared_res_list,)) for m in model_list]
         [p.start() for p in p_list]
@@ -55,11 +57,11 @@ class TextCluster:
             [p.join() for p in p_list]
             logger.info('Shared_res_list length:{}'.format(self.process_num, len(shared_res_list)))
         logger.info('Shared_res_list length:{}'.format(self.process_num, len(shared_res_list)))
-        return shared_res_list[0][:top_k]
+        return sorted(shared_res_list[0], key=lambda x: x.ranks, reverse=True)[:top_k]
 
-    def cluster(self, texts, top_k):
+    def cluster(self, texts, ids=None, top_k=100):
         rtn = []
-        hotspots = self.cluster_to_hotspot(texts, top_k)
+        hotspots = self.cluster_to_hotspot(texts, ids=ids, top_k=top_k)
         for idx, item in enumerate(hotspots):
             rtn.append({'topic_num': idx + 1, 'rank': item.ranks, 'keywords': item.keyword,
                         'texts': [r.text for r in item.record_list]})

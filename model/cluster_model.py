@@ -25,11 +25,11 @@ class TextClusterModel:
         text cluster
     """
 
-    def __init__(self, texts: List[str], vec_model: TextVecModel, top_k: int = 1000,
-                 sim_threshold: float = 0.93, ):
+    def __init__(self, texts: List[str], ids: List[int], vec_model: TextVecModel, top_k: int = 1000,
+                 sim_threshold: float = 0.92, ):
         # self.vec_model = vec_model   # Current paddle do not support multiprocess for pickle
         logger.info('W2V Model has been initialized successfully!')
-        record_list = vec_model.make_records(texts)
+        record_list = vec_model.make_records(texts, ids)
         logger.info('Texts to Records, finished.')
         self.sim_threshold = sim_threshold
         self.top_k = top_k
@@ -65,7 +65,7 @@ class HotspotClusterModel:
     """
 
     def __init__(self, hotspots_1: List[Hotspot], hotspots_2: List[Hotspot], top_k: int = 1000,
-                 sim_threshold: float = 0.88, ):
+                 sim_threshold: float = 0.9, ):
 
         self.hotspot_1 = hotspots_1
         self.hotspot_2 = hotspots_2

@@ -1,0 +1,6 @@
+numpy==1.18.5
+gensim==3.8.3
+pandas==1.1.4
+LAC==2.1.1
+psyco==1.6
+scikit_learn==0.24.2

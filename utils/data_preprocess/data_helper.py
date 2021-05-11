@@ -41,6 +41,7 @@ class TextClear:
         self.re_emoji = re.compile(r"\[.*]", re.S)
         self.re_hard = re.compile(r"​​", re.S)
         self.re_hard2 = re.compile(r"【.*】")
+        self.re_hard3 = re.compile(r"\-*盖乐世社区.+论坛")
 
     def clear_for_words(self, sentence):
         '''
@@ -76,6 +77,7 @@ class TextClear:
         sentence = self.tradition_to_simple(sentence)
         sentence = re.sub(self.re_hard, "", sentence)
         sentence = re.sub(self.re_hard2, "", sentence)
+        sentence = re.sub(self.re_hard3, "", sentence)
         sentence = self.delete_http_tag(sentence)
         # delete at
         sentence = self.delete_at(sentence)
@@ -126,16 +128,16 @@ class TextClear:
         return text
 
     @staticmethod
-    def wordsDeduplication(word_list: list):
+    def words_deduplication(word_list: list):
         """
             词去重
         Args:
-            word_list: ['中华民族伟大', '民族伟大']
+            word_list: [('中华民族伟大', pos, weight), ('中华民族', pos, weight)]
         Returns:
-            list: ['中华民族伟大']
+            list: [('中华民族伟大', pos, weight)]
         """
-        # 先set去重，按照长度降序
-        word_list = sorted(list(set(word_list)), key=lambda x: len(x), reverse=True)
+        # 先set去重，按照词长度降序
+        word_list = sorted(list(set(word_list)), key=lambda x: len(x[0]), reverse=True)
         words_num = len(word_list)
         if words_num < 2:
             # 判断词的个数
@@ -146,7 +148,7 @@ class TextClear:
             for j in range(words_num):
                 if i == j:  # 不和自身比较
                     continue
-                if word_list[i] in word_list[j]:
+                if word_list[i][0] in word_list[j][0]:
                     # 和其他词比较是否重复
                     # 如果重复，直接跳出，不保存该词
                     break
@@ -158,5 +160,5 @@ class TextClear:
 
 #
 # t = TextClear()
-# res = t.base_bert_clear(sentence='@天天都开心 , [阿斯顿撒]的。。【啊实打实打算】')
+# res = t.words_deduplication([('你好你好', 1), ('你好', 1)])
 # print(res)

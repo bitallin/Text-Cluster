@@ -8,8 +8,9 @@
 # @Reference:
 
 import numpy as np
-from data.record import Record
 from sklearn.metrics.pairwise import cosine_similarity
+import jiagu
+from data.record import Record
 
 
 class Hotspot:
@@ -21,7 +22,6 @@ class Hotspot:
 
     def __init__(self, record: Record):
         """
-
         Args:
             record:
         """
@@ -48,6 +48,8 @@ class Hotspot:
     def append_hotspot(self, hotspot):
         self.record_list.extend(hotspot.record_list)
         self.ranks += hotspot.ranks
+        self.record_vec_list.extend(hotspot.record_vec_list)
+        self.id_list.extend(hotspot.id_list)
 
     def get_texts(self):
         return [record.text for record in self.record_list]
@@ -57,4 +59,5 @@ class Hotspot:
         _matrix = np.array(self.record_vec_list)
         cos_res = np.sum(cosine_similarity(_matrix, _matrix), axis=-1)
         center_vec_idx = int(np.argmax(cos_res))
-        return self.record_list[center_vec_idx]
+
+        return self.record_list[center_vec_idx].text

@@ -1,4 +1,4 @@
-data/pretrain_word_embed/*
+data/pretrain_word_embed/*.txt
 data/raw
 logs/task.log
 nogit
@@ -6,3 +6,4 @@ nogit
 __pycache__
 .idea
 *.xlsx
+!5000-small.txt

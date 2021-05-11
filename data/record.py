@@ -23,5 +23,6 @@ class Record:
         self.keyword = keyword
         self.id_num = id_num
 
+
     def __str__(self):
         return self.text
