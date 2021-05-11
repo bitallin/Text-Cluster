@@ -64,7 +64,7 @@ class TextClear:
         sentence = re.sub(self.re_que_punc, '<que>', sentence)
         return sentence
 
-    def base_bert_clear(self, sentence, seq_len=128):
+    def base_bert_clear(self, sentence, seq_len=256):
         """
         clear text for bert
         Args:
@@ -81,7 +81,6 @@ class TextClear:
         sentence = self.delete_at(sentence)
         sentence = self.delete_none(sentence)
         sentence = self.delete_emoji(sentence)
-
         sentence = self.delete_http(sentence)
 
         return sentence[:seq_len]
@@ -126,7 +125,7 @@ class TextClear:
         return text
 
     @staticmethod
-    def wordsDeduplication(word_list: list):
+    def words_deduplication(word_list: list):
         """
             词去重
         Args:

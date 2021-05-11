@@ -26,9 +26,11 @@ class TextCluster:
         self.process_num = process_num
         self.pretrain_wv_fp = pretrain_wv_fp
 
-    def cluster_to_hotspot(self, texts, top_k=20) -> List[Hotspot]:
-        texts = split_list(texts, self.process_num)
-        model_list = [TextClusterModel(texts[i], self.w2v_model) for i in range(self.process_num)]
+    def cluster_to_hotspot(self, texts_list, top_k, kw_num, text_sim_threshold, topic_sim_threshold) -> List[Hotspot]:
+        texts_list = split_list(texts_list, self.process_num)
+        model_list = [TextClusterModel(texts=texts_list[i], vec_model=self.w2v_model, kw_num=kw_num,
+                                       sim_threshold=text_sim_threshold) for i in
+                      range(self.process_num)]
         shared_res_list = Manager().list([])
         p_list = [Process(target=m.cluster_to, args=(shared_res_list,)) for m in model_list]
         [p.start() for p in p_list]
@@ -43,6 +45,7 @@ class TextCluster:
                 try:
                     model_list.append(
                         HotspotClusterModel(hotspots_1=shared_res_list[i], hotspots_2=shared_res_list[i + 1],
+                                            sim_threshold=topic_sim_threshold,
                                             ))
                 except Exception as e:
                     single_hotspots = shared_res_list[-1]
@@ -55,11 +58,11 @@ class TextCluster:
             [p.join() for p in p_list]
             logger.info('Shared_res_list length:{}'.format(self.process_num, len(shared_res_list)))
         logger.info('Shared_res_list length:{}'.format(self.process_num, len(shared_res_list)))
-        return shared_res_list[0][:top_k]
+        return sorted(shared_res_list[0], key=lambda x: x.ranks, reverse=True)[:top_k]
 
-    def cluster(self, texts, top_k):
+    def cluster(self, texts, top_k, kw_num=7, text_sim_threshold=0.9, topic_sim_threshold=0.88):
         rtn = []
-        hotspots = self.cluster_to_hotspot(texts, top_k)
+        hotspots = self.cluster_to_hotspot(texts, top_k, kw_num, text_sim_threshold, topic_sim_threshold)
         for idx, item in enumerate(hotspots):
             rtn.append({'topic_num': idx + 1, 'rank': item.ranks, 'keywords': item.keyword,
                         'texts': [r.text for r in item.record_list]})

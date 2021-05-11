@@ -26,17 +26,18 @@ class TextClusterModel:
     """
 
     def __init__(self, texts: List[str], vec_model: TextVecModel, top_k: int = 1000,
-                 sim_threshold: float = 0.93, ):
+                 sim_threshold: float = 0.93, kw_num=7):
 
         # self.vec_model = vec_model   # Current paddle do not support multiprocess for pickle
         logger.info('W2V Model has been initialized successfully!')
-        record_list = vec_model.make_records(texts)
+        record_list = vec_model.make_records(texts, kw_num)
         logger.info('Texts to Records, finished.')
         self.sim_threshold = sim_threshold
         self.top_k = top_k
         self.records = [record for record in record_list if record.vec is not None]
 
     def run(self) -> List[Hotspot]:
+
         hotspot_list = [Hotspot(self.records[0])]
         hotspot_vecs = np.array([hotspot_list[0].vec])
         for record in self.records[1:]:

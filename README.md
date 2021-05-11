@@ -8,7 +8,7 @@ See TextCluster class in tasks/cluster.py
 ```python
 from tasks.cluster import TextCluster
 texts = ['北京在北方', '北京在北方', '南京在南方', '南京在南方', '南京在南方', '东京在东方','西北在西北方','西藏在西方']
-model = TextCluster(process_num=2)
+model = TextCluster(process_num=2, top_k=20)
 model.cluster(texts)
 Out:[{'topic_num': 1,
 	  'rank': 3,
